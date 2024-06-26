@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='MusicLogo.png') }}" type="image/icon type">
+    <title>Emotion-Based Music Player</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Emotion-Based Music Player</h1>
+        <p>Welcome to the Emotion-Based Music Player. This application uses your webcam to detect your emotions
+            and plays music that matches your mood.</p>
+        <p>Click the button below to start the emotion detection process. Ensure your webcam is enabled and positioned
+            correctly for the best experience.</p>
+        <form action="/emotion_detection" method="post">
+            <button type="submit" class="start-button">Start Emotion Detection</button>
+        </form>
+        <div class="instructions">
+            <h2>How It Works</h2>
+            <ol>
+                <li>Click the "Start Emotion Detection" button.</li>
+                <li>Allow access to your webcam when prompted.</li>
+                <li>The system will analyze your facial expressions and detect your emotion.</li>
+                <li>Press "q" on your keyboard to capture your emotion.</li>
+                <li>Music matching your current mood will be played.</li>
+            </ol>
+        </div>
+    </div>
+</body>
+
+</html>

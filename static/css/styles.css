@@ -1,0 +1,118 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    animation: backgroundAnimation 10s ease-in-out infinite;
+}
+
+@keyframes backgroundAnimation {
+    0% {
+        background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    }
+
+    50% {
+        background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+    }
+
+    100% {
+        background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    }
+}
+
+.container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: containerAnimation 1s ease-out;
+    margin: 0 10px 0 10px;
+}
+
+@keyframes containerAnimation {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    animation: textAnimation 2s ease-out;
+}
+
+@keyframes textAnimation {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+p {
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    animation: textAnimation 2s ease-out;
+}
+
+.instructions {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.instructions h2 {
+    color: #333;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.instructions ol {
+    color: #555;
+    font-size: 1.1em;
+}
+
+.start-button {
+    background: linear-gradient(135deg, #ff5e5e, #ff1e1e);
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    animation: buttonAnimation 2s ease-out;
+}
+
+@keyframes buttonAnimation {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.start-button:hover {
+    background: linear-gradient(135deg, #ff1e1e, #ff5e5e);
+    transform: scale(1.1);
+}

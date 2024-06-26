@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='MusicLogo.png') }}" type="image/icon type">
+    <title>Music Player</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/player_style.css') }}">
+</head>
+
+<body>
+    <div class="emotion-message-container">
+        <p id="emotion-message">Your facial expressions reflect this emotion: Anger </p>
+    </div>
+    <div class="player-body">
+        <div class="player">
+            <div class="details">
+                <div class="now-playing">PLAYING x OF y</div>
+                <div class="track-art"></div>
+                <div class="track-name">Track Name</div>
+                <div class="track-artist">Track Artist</div>
+            </div>
+            <div class="buttons">
+                <div class="prev-track" onclick="prevTrack()">
+                    <i class="fa fa-step-backward fa-2x"></i>
+                </div>
+                <div class="playpause-track" onclick="playpauseTrack()">
+                    <i class="fa fa-play-circle fa-5x"></i>
+                </div>
+                <div class="next-track" onclick="nextTrack()">
+                    <i class="fa fa-step-forward fa-2x"></i>
+                </div>
+            </div>
+            <div class="slider-container1">
+                <span class="current-time">00:00</span>
+                <input type="range" min="1" max="100" value="0" class="seek-slider" onchange="seekTo()">
+                <span class="total-duration">00:00</span>
+            </div>
+            <div class="slider-container2">
+                <i class="fa fa-volume-down"></i>
+                <input type="range" min="1" max="100" value="99" class="volume-slider" onchange="setVolume()">
+                <i class="fa fa-volume-up"></i>
+            </div>
+        </div>
+        <div class="song-list-container">
+            <h2>Song List</h2>
+            <div class="song-list">
+                <!-- Song items will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        let nowPlaying = document.querySelector(".now-playing");
+        let trackArt = document.querySelector(".track-art");
+        let trackName = document.querySelector(".track-name");
+        let trackArtist = document.querySelector(".track-artist");
+        let playPauseBtn = document.querySelector(".playpause-track");
+        let nextBtn = document.querySelector(".next-track");
+        let prevBtn = document.querySelector(".prev-track");
+        let seekSlider = document.querySelector(".seek-slider");
+        let volumeSlider = document.querySelector(".volume-slider");
+        let currTime = document.querySelector(".current-time");
+        let totalTime = document.querySelector(".total-duration");
+        let songList = document.querySelector(".song-list");
+        let trackIndex = 0;
+        let isPlaying = false;
+        let updateTimer;
+        let currTrack = document.createElement('audio');
+        let trackList = [
+            {
+                name: "Aarambh Hai Prachand",
+                artist: "Piyush Mishra",
+                image: "/static/Playlists/Angry/AarambhHaiPrachand.jpeg",
+                path: "/static/Playlists/Angry/Aarambh Hai Prachand.mp3"
+            },
+            {
+                name: "Challa",
+                artist: "Romy, Vivek Hariharan, Shashwat Sachdev",
+                image: "/static/Playlists/Angry/Challa.jpeg",
+                path: "/static/Playlists/Angry/Challa.mp3"
+            },
+
+            {
+                name: "Sadda haq",
+                artist: "Mohit Chauhan",
+                image: "/static/Playlists/Angry/Saddahaq.jpeg",
+                path: "/static/Playlists/Angry/Sadda haq Rockstar.mp3"
+            },
+            {
+                name: "Unstoppable",
+                artist: "Sia",
+                image: "/static/Playlists/Angry/Unstoppable.jpeg",
+                path: "/static/Playlists/Angry/Unstoppable.mp3"
+            },
+            {
+                name: "Believer",
+                artist: "Imagine Dragons",
+                image: "/static/Playlists/Angry/Believer.jpeg",
+                path: "/static/Playlists/Angry/Believer.mp3"
+            },
+            {
+                name: "Zinda",
+                artist: "Siddharth Mahadevan",
+                image: "/static/Playlists/Angry/Zinda.jpeg",
+                path: "/static/Playlists/Angry/Zinda.mp3"
+            }
+
+        ];
+
+        // Function to create the song list dynamically
+        function createSongList() {
+            // Clear existing song list
+            songList.innerHTML = '';
+
+            // Loop through the trackList array
+            trackList.forEach((track, index) => {
+                // Create a new div element for each song item
+                let songItem = document.createElement('div');
+                songItem.classList.add('song-item');
+                songItem.textContent = track.name;
+
+                // Add click event listener to play the selected track
+                songItem.addEventListener('click', () => {
+                    playSelectedTrack(index);
+                });
+
+                // Append the song item to the song list container
+                songList.appendChild(songItem);
+            });
+        }
+
+        function loadTrack(trackIndex) {
+            clearInterval(updateTimer);
+            resetValues();
+            currTrack.src = trackList[trackIndex].path;
+            currTrack.load();
+            trackArt.style.backgroundImage = `url(${trackList[trackIndex].image})`;
+            trackName.textContent = trackList[trackIndex].name;
+            trackArtist.textContent = trackList[trackIndex].artist;
+            nowPlaying.textContent = `PLAYING ${trackIndex + 1} OF ${trackList.length}`;
+            updateTimer = setInterval(seekUpdate, 1000);
+            currTrack.addEventListener("ended", nextTrack);
+            randomBgColor();
+            highlightPlayingSong();
+        }
+
+        function randomBgColor() {
+            let red = Math.floor(Math.random() * 256) + 64;
+            let green = Math.floor(Math.random() * 256) + 64;
+            let blue = Math.floor(Math.random() * 256) + 64;
+            let bgColor = `rgb(${red}, ${green}, ${blue})`;
+            document.body.style.background = bgColor;
+        }
+
+        function resetValues() {
+            currTime.textContent = "00:00";
+            totalTime.textContent = "00:00";
+            seekSlider.value = 0;
+        }
+
+        function playpauseTrack() {
+            if (!isPlaying) playTrack();
+            else pauseTrack();
+        }
+
+        function playTrack() {
+            currTrack.play();
+            isPlaying = true;
+            playPauseBtn.innerHTML = '<i class="fa fa-pause-circle fa-5x"></i>';
+        }
+
+        function pauseTrack() {
+            currTrack.pause();
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fa fa-play-circle fa-5x"></i>';
+        }
+
+        function nextTrack() {
+            trackIndex = (trackIndex + 1) % trackList.length;
+            loadTrack(trackIndex);
+            playTrack();
+        }
+
+        function prevTrack() {
+            trackIndex = (trackIndex - 1 + trackList.length) % trackList.length;
+            loadTrack(trackIndex);
+            playTrack();
+        }
+
+        function seekTo() {
+            let seekTo = currTrack.duration * (seekSlider.value / 100);
+            currTrack.currentTime = seekTo;
+        }
+
+        function setVolume() {
+            currTrack.volume = volumeSlider.value / 100;
+        }
+
+        function seekUpdate() {
+            let seekPosition = currTrack.currentTime * (100 / currTrack.duration);
+            seekSlider.value = seekPosition.toFixed(2);
+            let currentMinutes = Math.floor(currTrack.currentTime / 60);
+            let currentSeconds = Math.floor(currTrack.currentTime - currentMinutes * 60);
+            let durationMinutes = Math.floor(currTrack.duration / 60);
+            let durationSeconds = Math.floor(currTrack.duration - durationMinutes * 60);
+            currTime.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' + currentSeconds : currentSeconds}`;
+            totalTime.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' + durationSeconds : durationSeconds}`;
+        }
+
+        function playSelectedTrack(index) {
+            trackIndex = index;
+            loadTrack(trackIndex);
+            playTrack();
+        }
+
+        function highlightPlayingSong() {
+            let songItems = document.querySelectorAll('.song-item');
+            songItems.forEach((item, index) => {
+                if (index === trackIndex) {
+                    item.classList.add('playing');
+                } else {
+                    item.classList.remove('playing');
+                }
+            });
+        }
+
+        // Initial load
+        createSongList();
+        loadTrack(trackIndex);
+    </script>
+</body>
+
+</html>
